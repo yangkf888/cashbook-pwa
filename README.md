@@ -37,9 +37,7 @@ NEXTAUTH_SECRET=replace-with-strong-secret
 ## 本地启动（pnpm）
 ```bash
 pnpm install
-pnpm prisma:generate
-pnpm prisma:migrate
-pnpm prisma:seed
+pnpm bootstrap
 pnpm dev
 ```
 访问 http://localhost:3000
@@ -53,19 +51,15 @@ pnpm dev
 ```bash
 cp .env.example .env
 ```
-2) 启动服务
+2) 启动服务并初始化数据库（单条命令）
 ```bash
-docker compose up -d --build
-```
-3) 运行迁移与种子数据（若更新 Prisma/Docker 依赖，请先重新构建镜像）
-```bash
-docker compose exec web pnpm prisma:migrate
-docker compose exec web pnpm prisma:seed
+docker compose up -d --build && docker compose exec web pnpm bootstrap
 ```
 访问 http://localhost:3000
 
 ## Prisma 常用命令
 ```bash
+pnpm bootstrap
 pnpm prisma:generate
 pnpm prisma:migrate
 pnpm prisma:seed
