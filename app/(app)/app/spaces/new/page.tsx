@@ -37,7 +37,7 @@ export default function NewSpacePage() {
   };
 
   return (
-    <div className="max-w-lg space-y-6">
+    <div className="mx-auto max-w-lg space-y-6 px-4 py-6">
       <div>
         <h1 className="text-2xl font-bold">新建家庭账本</h1>
         <p className="mt-2 text-sm text-slate-600">
