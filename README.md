@@ -27,7 +27,7 @@ prisma/
 ```
 
 ## 环境变量
-复制 `.env.example` 为 `.env` 并填写：
+复制 `.env.example` 为 `.env`，仅需修改 `NEXTAUTH_URL` / `NEXTAUTH_SECRET`：
 ```
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=postgres
