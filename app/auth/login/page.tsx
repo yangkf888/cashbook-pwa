@@ -16,7 +16,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     redirect("/app");
   }
 
-  const callbackUrl = searchParams?.callbackUrl ?? "/app";
+  const rawCallbackUrl = searchParams?.callbackUrl;
+  const callbackUrl =
+    rawCallbackUrl && !rawCallbackUrl.startsWith("/auth") ? rawCallbackUrl : "/app";
 
   return <LoginForm callbackUrl={callbackUrl} />;
 }
