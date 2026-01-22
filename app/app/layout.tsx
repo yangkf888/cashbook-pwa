@@ -1,9 +1,7 @@
 import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import SignOutButton from "@/components/SignOutButton";
-import { headers } from "next/headers";
 
 export default async function AppLayout({
   children
@@ -11,11 +9,6 @@ export default async function AppLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession(authOptions);
-
-  if (!session?.user?.id) {
-    const callbackUrl = headers().get("x-next-url") ?? "/app";
-    redirect(`/auth/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
-  }
 
   return (
     <div className="min-h-screen bg-slate-50">
