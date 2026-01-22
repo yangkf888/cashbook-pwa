@@ -70,11 +70,7 @@ docker compose up -d --build
 ```bash
 docker compose exec web pnpm bootstrap
 ```
-4) 验证 Prisma 客户端可用
-```bash
-docker compose exec web node -e "require('@prisma/client'); console.log('prisma ok')"
-```
-5) 访问登录页
+4) 访问登录页
 ```bash
 http://<VPS_IP>:3000/auth/login
 ```
@@ -90,4 +86,4 @@ pnpm prisma:seed
 ## 常见问题
 - **端口冲突**：确保 3000 和 5432 没有被占用。
 - **数据库连接失败**：检查 `DATABASE_URL` 是否与容器/本地地址匹配。
-- **首次登录失败**：请先运行 `pnpm prisma:migrate` 与 `pnpm prisma:seed`。
+- **首次登录失败**：请先运行 `pnpm bootstrap` 以生成数据库表并写入种子账号。
