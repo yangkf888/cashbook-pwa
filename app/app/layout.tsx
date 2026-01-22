@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import SignOutButton from "@/components/SignOutButton";
+import { headers } from "next/headers";
 
 export default async function AppLayout({
   children
@@ -12,7 +13,8 @@ export default async function AppLayout({
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect("/auth/login");
+    const callbackUrl = headers().get("x-next-url") ?? "/app";
+    redirect(`/auth/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
   }
 
   return (
