@@ -57,7 +57,7 @@ cp .env.example .env
 ```bash
 docker compose up -d --build
 ```
-3) 运行迁移与种子数据
+3) 运行迁移与种子数据（若更新 Prisma/Docker 依赖，请先重新构建镜像）
 ```bash
 docker compose exec web pnpm prisma:migrate
 docker compose exec web pnpm prisma:seed
