@@ -12,6 +12,7 @@ COPY package.json pnpm-lock.yaml* ./
 RUN pnpm install
 
 COPY . .
+RUN test -f scripts/bootstrap.sh
 RUN pnpm prisma generate
 RUN node -e "require('@prisma/client'); console.log('prisma ok')"
 RUN pnpm build
@@ -28,7 +29,9 @@ COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/public ./public
 COPY --from=build /app/prisma ./prisma
+COPY --from=build /app/scripts ./scripts
 COPY --from=build /app/next.config.mjs ./next.config.mjs
+RUN test -f scripts/bootstrap.sh
 
 EXPOSE 3000
 
