@@ -62,19 +62,15 @@ docker compose up -d --build && docker compose exec web pnpm bootstrap
 ```bash
 cp .env.example .env
 ```
-2) 构建并启动容器（首次或更新版本）
+2) 构建并启动容器 + 初始化数据库
 ```bash
-docker compose up -d --build
+docker compose up -d --build && docker compose exec web pnpm bootstrap
 ```
-3) 初始化数据库（首次部署或需要重置时）
-```bash
-docker compose exec web pnpm bootstrap
-```
-4) 验证 Prisma 客户端可用
+3) 验证 Prisma 客户端可用
 ```bash
 docker compose exec web node -e "require('@prisma/client'); console.log('prisma ok')"
 ```
-5) 访问登录页
+4) 访问登录页
 ```bash
 http://<VPS_IP>:3000/auth/login
 ```
