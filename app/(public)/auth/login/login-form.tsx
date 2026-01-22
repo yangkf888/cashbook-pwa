@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type LoginFormProps = {
   callbackUrl: string;
 };
 
 export default function LoginForm({ callbackUrl }: LoginFormProps) {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +24,8 @@ export default function LoginForm({ callbackUrl }: LoginFormProps) {
     const result = await signIn("credentials", {
       redirect: false,
       email,
-      password
+      password,
+      callbackUrl
     });
 
     setLoading(false);
@@ -32,7 +35,7 @@ export default function LoginForm({ callbackUrl }: LoginFormProps) {
       return;
     }
 
-    window.location.href = callbackUrl;
+    router.push(result?.url ?? callbackUrl);
   };
 
   return (
