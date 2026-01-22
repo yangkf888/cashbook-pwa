@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SpaceType {
+  personal
+  family
+}
+
+enum SpaceRole {
+  owner
+  member
+  viewer
+}
+
+model User {
+  id           String         @id @default(uuid())
+  email        String         @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  memberships  SpaceMember[]
+}
+
+model Space {
+  id        String        @id @default(uuid())
+  type      SpaceType
+  name      String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  members   SpaceMember[]
+}
+
+model SpaceMember {
+  id        String    @id @default(uuid())
+  space     Space     @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  spaceId   String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  role      SpaceRole
+  createdAt DateTime  @default(now())
+
+  @@unique([spaceId, userId])
+}
