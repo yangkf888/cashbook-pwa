@@ -62,13 +62,9 @@ docker compose up -d --build && docker compose exec web pnpm bootstrap
 ```bash
 cp .env.example .env
 ```
-2) 构建并启动容器（首次或更新版本）
+2) 构建并启动容器 + 初始化数据库
 ```bash
-docker compose up -d --build
-```
-3) 初始化数据库（首次部署或需要重置时）
-```bash
-docker compose exec web pnpm bootstrap
+docker compose up -d --build && docker compose exec web pnpm bootstrap
 ```
 4) 访问登录页
 ```bash
