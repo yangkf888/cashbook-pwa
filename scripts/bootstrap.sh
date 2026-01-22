@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -e
 
 pnpm prisma:generate
 pnpm prisma:deploy
