@@ -18,7 +18,7 @@ export default async function AppLayout({
             Cashbook
           </Link>
           <div className="flex items-center gap-4 text-sm text-slate-600">
-            <span>{session.user.email}</span>
+            <span>{session?.user?.email ?? ""}</span>
             <SignOutButton />
           </div>
         </div>
