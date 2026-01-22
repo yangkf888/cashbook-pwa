@@ -14,6 +14,7 @@ COPY . .
 FROM base AS build
 
 RUN pnpm prisma generate
+RUN node -e "require('@prisma/client/default'); console.log('default ok')"
 RUN pnpm build
 
 FROM node:20-bullseye-slim AS runner
@@ -24,7 +25,7 @@ ENV NODE_ENV=production
 RUN corepack enable && corepack prepare pnpm@10.28.1 --activate
 
 COPY --from=base /app/package.json /app/pnpm-lock.yaml* ./
-COPY --from=base /app/node_modules ./node_modules
+COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/.next ./.next
 COPY --from=base /app/public ./public
 COPY --from=base /app/prisma ./prisma
