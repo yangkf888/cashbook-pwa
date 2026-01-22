@@ -1,60 +1,118 @@
 import bcrypt from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, SpaceRole, SpaceType } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const seedUsers = [
-  {
-    email: "alice@example.com",
-    password: "password123",
-    name: "Alice"
-  },
-  {
-    email: "bob@example.com",
-    password: "password123",
-    name: "Bob"
-  }
+const DEFAULT_PASSWORD = "password123";
+const USERS = [
+  { email: "alice@example.com", name: "Alice" },
+  { email: "bob@example.com", name: "Bob" },
 ];
 
-async function ensureSeedUser(email: string, password: string, name: string) {
-  const existingUser = await prisma.user.findUnique({ where: { email } });
-  if (existingUser) {
-    console.log(`Seed user already exists: ${email}`);
-    return;
-  }
-
-  const passwordHash = await bcrypt.hash(password, 10);
-
-  await prisma.$transaction(async (tx) => {
-    const user = await tx.user.create({
-      data: {
-        email,
-        passwordHash,
-        name
-      }
-    });
-
-    await tx.space.create({
-      data: {
-        type: "personal",
-        name: "我的账本",
-        members: {
-          create: {
-            userId: user.id,
-            role: "owner"
-          }
-        }
-      }
-    });
+async function ensurePersonalSpace(userId: string, fallbackName: string) {
+  const existingSpace = await prisma.space.findFirst({
+    where: {
+      type: SpaceType.personal,
+      members: { some: { userId } },
+    },
   });
 
-  console.log(`Seed user created: ${email}`);
+  if (existingSpace) {
+    await prisma.spaceMember.upsert({
+      where: {
+        spaceId_userId: {
+          spaceId: existingSpace.id,
+          userId,
+        },
+      },
+      update: { role: SpaceRole.owner },
+      create: {
+        spaceId: existingSpace.id,
+        userId,
+        role: SpaceRole.owner,
+      },
+    });
+    return existingSpace;
+  }
+
+  return prisma.space.create({
+    data: {
+      type: SpaceType.personal,
+      name: `${fallbackName}的账本`,
+      members: {
+        create: {
+          userId,
+          role: SpaceRole.owner,
+        },
+      },
+    },
+  });
+}
+
+async function ensureFamilySpace(userIds: string[]) {
+  const existingSpace = await prisma.space.findFirst({
+    where: {
+      type: SpaceType.family,
+      name: "Family",
+    },
+  });
+
+  const familySpace =
+    existingSpace ??
+    (await prisma.space.create({
+      data: {
+        type: SpaceType.family,
+        name: "Family",
+      },
+    }));
+
+  await Promise.all(
+    userIds.map((userId) =>
+      prisma.spaceMember.upsert({
+        where: {
+          spaceId_userId: {
+            spaceId: familySpace.id,
+            userId,
+          },
+        },
+        update: { role: SpaceRole.member },
+        create: {
+          spaceId: familySpace.id,
+          userId,
+          role: SpaceRole.member,
+        },
+      })
+    )
+  );
 }
 
 async function main() {
-  for (const user of seedUsers) {
-    await ensureSeedUser(user.email, user.password, user.name);
-  }
+  const passwordHash = await bcrypt.hash(DEFAULT_PASSWORD, 10);
+
+  const userRecords = await Promise.all(
+    USERS.map((user) =>
+      prisma.user.upsert({
+        where: { email: user.email },
+        update: {
+          name: user.name,
+          passwordHash,
+        },
+        create: {
+          email: user.email,
+          name: user.name,
+          passwordHash,
+        },
+      })
+    )
+  );
+
+  await Promise.all(
+    userRecords.map((user) => ensurePersonalSpace(user.id, user.name ?? "用户"))
+  );
+
+  await ensureFamilySpace(userRecords.map((user) => user.id));
+
+  console.log("Seed completed: default users and spaces are ready.");
 }
 
 main()
