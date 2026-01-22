@@ -29,10 +29,14 @@ prisma/
 ## 环境变量
 复制 `.env.example` 为 `.env` 并填写：
 ```
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/cashbook?schema=public
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=replace-with-strong-secret
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_DB=cashbook
+DATABASE_URL=postgresql://postgres:postgres@db:5432/cashbook?schema=public
+NEXTAUTH_URL=http://127.0.0.1:3000
+NEXTAUTH_SECRET=替换为长随机
 ```
+VPS 上请将 `NEXTAUTH_URL` 改为 `http://公网IP:3000` 或绑定域名后的地址。
 
 ## 本地启动（pnpm）
 ```bash
@@ -75,7 +79,7 @@ http://<VPS_IP>:3000/auth/login
 ```bash
 pnpm bootstrap
 pnpm prisma:generate
-pnpm prisma:migrate
+pnpm prisma:deploy
 pnpm prisma:seed
 ```
 
